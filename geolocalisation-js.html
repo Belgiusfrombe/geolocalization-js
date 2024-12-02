@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Géolocalisation avec Tailwind CSS</title>
+    <title>Géolocalisation avec WeatherAPI et Tailwind CSS</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
@@ -25,37 +25,22 @@
     </div>
 
     <script>
+        const apiKey = '01c1b65aff3b4e1791c143712240212'; // Remplacez avec votre clé API WeatherAPI
+
         async function getGeolocation() {
-            // Déclaration d'un pays fictif pour l'exemple
-            const pays = "Belgium";
-
-            // PROMISE -> En JavaScript, une Promise est un mécanisme qui permet de gérer les opérations asynchrones de manière plus propre et plus structurée.
-            // ================= =================
-            //      FONCTIONNEMENT PROMISE
-            // ================= =================
-
-            // Une Promise peut être dans l'un des trois états suivants :
-            // ================= =================
-            //  1.     EN ATTENTE (Pending)
-            // ================= =================
-            // La Promise est en cours d'exécution, et le résultat n'est pas encore disponible.
-
-            // ================= =================
-            //  2.       RESOLUE (Fulfilled)
-            // ================= =================
-            // L'opération asynchrone est terminée avec succès, et la Promise contient la valeur de retour.
-
-            // ================= =================
-            //  3.       REJETEE (Rejected)
-            // ================= =================
-            // L'opération asynchrone a échoué, et la Promise contient une erreur.
-
+            // Utilisation de la géolocalisation native du navigateur pour obtenir la position
             return new Promise((resolve, reject) => {
-                // Utilisation de la géolocalisation native du navigateur pour obtenir la position
                 navigator.geolocation.getCurrentPosition(
-                    // Si la géolocalisation réussit
                     (position) => {
-                        resolve(position.coords.latitude + " - " + position.coords.longitude + " - " + pays);
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+
+                        // Utiliser WeatherAPI pour obtenir des détails de géolocalisation
+                        getLocationFromAPI(lat, lon).then((location) => {
+                            resolve(location);
+                        }).catch((error) => {
+                            reject('Erreur lors de la récupération des détails de la localisation: ' + error);
+                        });
                     },
                     // CATCH ERROR -> En cas d'erreur, on rejette la promise avec un message d'erreur
                     (error) => {
@@ -63,6 +48,22 @@
                     }
                 );
             });
+        }
+
+        async function getLocationFromAPI(lat, lon) {
+            // Utiliser l'API WeatherAPI pour récupérer les informations de localisation
+            const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${lat},${lon}`;
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.location) {
+                // Extraire le pays et la ville depuis la réponse de WeatherAPI
+                const country = data.location.country;
+                const city = data.location.name;
+                return `Latitude: ${lat}, Longitude: ${lon},  ${city}, ${country}`;
+            } else {
+                throw new Error('Aucune donnée géographique trouvée');
+            }
         }
 
         async function displayLocation() {
