@@ -1,51 +1,87 @@
-<script>
-    async function getGeolocation() {
-        const pays = "Belgium";
-        // PROMISE -> En JavaScript, une Promise est un mécanisme qui permet de gérer les opérations asynchrones de manière plus propre et plus structurée. Les Promises permettent d'éviter les problèmes associés aux callbacks imbriqués (aussi appelé "callback hell"), ce qui rend le code plus lisible et facile à maintenir.
-        // ================= =================
-        //      FONCTIONNEMENT PROMISE
-        // ================= =================
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Géolocalisation avec Tailwind CSS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
+    <!-- Container principal -->
+    <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg text-center">
+        <h1 class="text-3xl font-semibold text-blue-600 mb-4">Votre Position Géographique</h1>
 
-        // Une Promise peut être dans l'un des trois états suivants :
+        <!-- Affichage de la localisation -->
+        <div id="location" class="text-lg font-medium text-gray-700">
+            <p class="text-xl mb-2">Chargement des informations...</p>
+        </div>
 
-        // ================= =================
-        //  1.     EN ATTENTE (Pending)
-        // ================= =================
-        // La Promise est en cours d'exécution, et le résultat n'est pas encore disponible.
+        <!-- Affichage des erreurs -->
+        <div id="error" class="text-lg font-medium text-red-600 mt-4 hidden">
+            <p>Erreur pour afficher la localisation.</p>
+        </div>
 
-        // ================= =================
-        //  2.       RESOLUE (Fulfilled)
-        // ================= =================
-        // L'opération asynchrone est terminée avec succès, et la Promise contient la valeur de retour.
+    </div>
 
-        // ================= =================
-        //  3.       REJETEE (Rejected)
-        // ================= =================
-        // L'opération asynchrone a échoué, et la Promise contient une erreur.
+    <script>
+        async function getGeolocation() {
+            // Déclaration d'un pays fictif pour l'exemple
+            const pays = "Belgium";
 
-      return new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            resolve(position.coords.latitude + " - " + position.coords.longitude + " - " + pays);
-          },
-          // CATCH ERROR
-          (error) => {
-            reject('Erreur de la récupération de la localisation: ' + error.message);
-          }
-        );
-      });
-    }
+            // PROMISE -> En JavaScript, une Promise est un mécanisme qui permet de gérer les opérations asynchrones de manière plus propre et plus structurée.
+            // ================= =================
+            //      FONCTIONNEMENT PROMISE
+            // ================= =================
 
-    async function displayLocation() {
-      try {
-        const result = await getGeolocation();
-        console.log(result);
-        document.write(result);
-      } catch (error) {
-        document.write('Erreur pour afficher la localisation')
-      }
-    }
+            // Une Promise peut être dans l'un des trois états suivants :
+            // ================= =================
+            //  1.     EN ATTENTE (Pending)
+            // ================= =================
+            // La Promise est en cours d'exécution, et le résultat n'est pas encore disponible.
 
-    displayLocation();
-</script>
+            // ================= =================
+            //  2.       RESOLUE (Fulfilled)
+            // ================= =================
+            // L'opération asynchrone est terminée avec succès, et la Promise contient la valeur de retour.
+
+            // ================= =================
+            //  3.       REJETEE (Rejected)
+            // ================= =================
+            // L'opération asynchrone a échoué, et la Promise contient une erreur.
+
+            return new Promise((resolve, reject) => {
+                // Utilisation de la géolocalisation native du navigateur pour obtenir la position
+                navigator.geolocation.getCurrentPosition(
+                    // Si la géolocalisation réussit
+                    (position) => {
+                        resolve(position.coords.latitude + " - " + position.coords.longitude + " - " + pays);
+                    },
+                    // CATCH ERROR -> En cas d'erreur, on rejette la promise avec un message d'erreur
+                    (error) => {
+                        reject('Erreur de la récupération de la localisation: ' + error.message);
+                    }
+                );
+            });
+        }
+
+        async function displayLocation() {
+            try {
+                // Appel de la fonction getGeolocation() pour obtenir les données
+                const result = await getGeolocation();
+                console.log(result);
+                // Afficher la localisation dans la page
+                document.getElementById('location').innerHTML = `<p>Votre position: ${result}</p>`;
+            } catch (error) {
+                // Afficher un message d'erreur si la promesse est rejetée
+                document.getElementById('error').classList.remove('hidden');
+                console.error(error);
+            }
+        }
+
+        // Exécution de la fonction displayLocation() lors du chargement de la page
+        displayLocation();
+    </script>
+
+</body>
+</html>
