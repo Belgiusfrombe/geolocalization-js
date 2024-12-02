@@ -1,0 +1,51 @@
+<script>
+    async function getGeolocation() {
+        const pays = "Belgium";
+        // PROMISE -> En JavaScript, une Promise est un mécanisme qui permet de gérer les opérations asynchrones de manière plus propre et plus structurée. Les Promises permettent d'éviter les problèmes associés aux callbacks imbriqués (aussi appelé "callback hell"), ce qui rend le code plus lisible et facile à maintenir.
+        // ================= =================
+        //      FONCTIONNEMENT PROMISE
+        // ================= =================
+
+
+        // Une Promise peut être dans l'un des trois états suivants :
+
+        // ================= =================
+        //  1.     EN ATTENTE (Pending)
+        // ================= =================
+        // La Promise est en cours d'exécution, et le résultat n'est pas encore disponible.
+
+        // ================= =================
+        //  2.       RESOLUE (Fulfilled)
+        // ================= =================
+        // L'opération asynchrone est terminée avec succès, et la Promise contient la valeur de retour.
+
+        // ================= =================
+        //  3.       REJETEE (Rejected)
+        // ================= =================
+        // L'opération asynchrone a échoué, et la Promise contient une erreur.
+
+      return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            resolve(position.coords.latitude + " - " + position.coords.longitude + " - " + pays);
+          },
+          // CATCH ERROR
+          (error) => {
+            reject('Erreur de la récupération de la localisation: ' + error.message);
+          }
+        );
+      });
+    }
+
+    async function displayLocation() {
+      try {
+        const result = await getGeolocation();
+        console.log(result);
+        document.write(result);
+      } catch (error) {
+        document.write('Erreur pour afficher la localisation')
+      }
+    }
+
+    displayLocation();
+</script>
